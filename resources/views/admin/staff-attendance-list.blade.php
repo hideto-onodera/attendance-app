@@ -11,23 +11,9 @@
     </div>
 
     <div class="content__menu">
-        <a
-            class="previous-month"
-            href="?date={{ $previousMonth }}"
-        >
-            前月
-        </a>
-
-        <p class="current-month">
-            {{ $date->format('Y/m') }}
-        </p>
-
-        <a
-            class="next-month"
-            href="?date={{ $nextMonth }}"
-        >
-            翌月
-        </a>
+        <a class="previous-month" href="?date={{ $previousMonth }}">前月</a>
+        <p class="current-month">{{ $date->format('Y/m') }}</p>
+        <a class="next-month" href="?date={{ $nextMonth }}">翌月</a>
     </div>
 
     <table class="table">
@@ -59,47 +45,54 @@
                         {{ $attendanceRecord['date'] }}
                     </p>
                 </td>
-
                 <td class="table__description">
                     <p class="table__description--item">
                         {{ $attendanceRecord['clock_in'] }}
                     </p>
                 </td>
-
                 <td class="table__description">
                     <p class="table__description--item">
                         {{ $attendanceRecord['clock_out'] }}
                     </p>
                 </td>
-
                 <td class="table__description">
                     <p class="table__description--item">
-                        {{ $attendanceRecord['total_break_time']
-                            ? \Carbon\Carbon::parse($attendanceRecord['total_break_time'])->format('G:i')
-                            : '' }}
+                        @if ($attendanceRecord['total_break_time'])
+                            {{ \Carbon\Carbon::parse($attendanceRecord['total_break_time'])->format('G:i') }}
+                        @endif
                     </p>
                 </td>
-
                 <td class="table__description">
                     <p class="table__description--item">
-                        {{ $attendanceRecord['total_time']
-                            ? \Carbon\Carbon::parse($attendanceRecord['total_time'])->format('G:i')
-                            : '' }}
+                        @if ($attendanceRecord['total_time'])
+                            {{ \Carbon\Carbon::parse($attendanceRecord['total_time'])->format('G:i') }}
+                        @endif
                     </p>
                 </td>
-
                 <td class="table__description">
-                    @if (!empty($attendanceRecord['id']))
+                    <p class="table__description--item">
                         <a
                             class="table__item--detail-link"
                             href="{{ url('/admin/attendance/' . $attendanceRecord['id']) }}"
                         >
                             詳細
                         </a>
-                    @endif
+                    </p>
                 </td>
             </tr>
         @endforeach
     </table>
+
+    <div class="csv-button">
+        <a
+            class="csv-button__submit"
+            href="{{ route('admin.attendance.staff.csv', [
+                'id' => $user->id,
+                'date' => $date->format('Y-m'),
+            ]) }}"
+        >
+            CSV出力
+        </a>
+    </div>
 </div>
 @endsection

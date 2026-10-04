@@ -244,6 +244,97 @@ class AdminAttendanceController extends Controller
         ));
     }
 
+    public function exportStaffAttendanceCsv(Request $request, $id)
+    {
+        $user = User::where('admin_status', false)
+            ->findOrFail($id);
+
+        $date = $request->filled('date')
+            ? Carbon::parse($request->input('date'))->startOfMonth()
+            : now()->startOfMonth();
+
+        $attendanceRecords = AttendanceRecord::with('breaks')
+            ->where('user_id', $user->id)
+            ->whereYear('date', $date->year)
+            ->whereMonth('date', $date->month)
+            ->orderBy('date')
+            ->get();
+
+        $fileName = sprintf(
+            'attendance_%s_%s.csv',
+            $user->id,
+            $date->format('Y_m')
+        );
+
+        return response()->streamDownload(function () use ($attendanceRecords) {
+            $handle = fopen('php://output', 'w');
+
+            fwrite($handle, "\xEF\xBB\xBF");
+
+            fputcsv($handle, [
+                '日付',
+                '出勤',
+                '退勤',
+                '休憩',
+                '合計',
+            ]);
+
+            foreach ($attendanceRecords as $attendanceRecord) {
+                $totalBreakMinutes = $attendanceRecord->breaks->sum(
+                    function ($break) {
+                        if (!$break->break_in || !$break->break_out) {
+                            return 0;
+                        }
+
+                        return Carbon::parse($break->break_in)
+                            ->diffInMinutes(Carbon::parse($break->break_out));
+                    }
+                );
+
+                $totalBreakTime = '';
+                $totalTime = '';
+
+                if ($attendanceRecord->clock_in && $attendanceRecord->clock_out) {
+                    $workMinutes = Carbon::parse($attendanceRecord->clock_in)
+                        ->diffInMinutes(Carbon::parse($attendanceRecord->clock_out));
+
+                    $totalWorkMinutes = max(
+                        0,
+                        $workMinutes - $totalBreakMinutes
+                    );
+
+                    $totalBreakTime = sprintf(
+                        '%d:%02d',
+                        intdiv($totalBreakMinutes, 60),
+                        $totalBreakMinutes % 60
+                    );
+
+                    $totalTime = sprintf(
+                        '%d:%02d',
+                        intdiv($totalWorkMinutes, 60),
+                        $totalWorkMinutes % 60
+                    );
+                }
+
+                fputcsv($handle, [
+                    Carbon::parse($attendanceRecord->date)->format('Y/m/d'),
+                    $attendanceRecord->clock_in
+                        ? Carbon::parse($attendanceRecord->clock_in)->format('H:i')
+                        : '',
+                    $attendanceRecord->clock_out
+                        ? Carbon::parse($attendanceRecord->clock_out)->format('H:i')
+                        : '',
+                    $totalBreakTime,
+                    $totalTime,
+                ]);
+            }
+
+            fclose($handle);
+        }, $fileName, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+        ]);
+    }
+
     public function applicationList()
     {
         $applications = Application::with([
