@@ -9,7 +9,7 @@
 1. リポジトリを取得します。
 
 ```bash
-git clone <リポジトリURL>
+git clone https://github.com/hideto-onodera/attendance-app.git
 ```
 
 2. プロジェクトディレクトリへ移動します。
@@ -122,4 +122,4 @@ docker run --rm \
 
 ## ER図
 
-ER図は基本設計に基づいて作成予定です。
+ER図は提出用のテーブル仕様書に記載しています。
