@@ -36,6 +36,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/attendance/list', [AttendanceController::class, 'list'])
         ->name('attendance.list');
 
+    Route::get('/attendance/report', [AttendanceController::class, 'report'])
+        ->name('attendance.report');
+
     Route::get('/attendance/detail/{id}', [AttendanceController::class, 'show'])
         ->name('attendance.detail');
 

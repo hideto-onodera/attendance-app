@@ -164,6 +164,129 @@ class AttendanceController extends Controller
         ));
     }
 
+    public function report(Request $request)
+    {
+        $user = $request->user();
+
+        $startMonth = now()->subMonthsNoOverflow(5)->startOfMonth();
+        $endMonth = now()->endOfMonth();
+
+        $attendanceRecords = AttendanceRecord::with('breaks')
+            ->where('user_id', $user->id)
+            ->whereBetween('date', [
+                $startMonth->toDateString(),
+                $endMonth->toDateString(),
+            ])
+            ->orderBy('date')
+            ->get();
+
+        $calculatedRecords = $attendanceRecords->map(function ($attendanceRecord) {
+            if (!$attendanceRecord->clock_in || !$attendanceRecord->clock_out) {
+                return [
+                    'date' => Carbon::parse($attendanceRecord->date),
+                    'clock_in' => $attendanceRecord->clock_in,
+                    'clock_out' => $attendanceRecord->clock_out,
+                    'work_minutes' => 0,
+                    'overtime_minutes' => 0,
+                ];
+            }
+
+            $breakMinutes = $attendanceRecord->breaks->sum(function ($break) {
+                if (!$break->break_in || !$break->break_out) {
+                    return 0;
+                }
+
+                return Carbon::parse($break->break_in)
+                    ->diffInMinutes(Carbon::parse($break->break_out));
+            });
+
+            $elapsedMinutes = Carbon::parse($attendanceRecord->clock_in)
+                ->diffInMinutes(Carbon::parse($attendanceRecord->clock_out));
+
+            $workMinutes = max(0, $elapsedMinutes - $breakMinutes);
+
+            return [
+                'date' => Carbon::parse($attendanceRecord->date),
+                'clock_in' => $attendanceRecord->clock_in,
+                'clock_out' => $attendanceRecord->clock_out,
+                'work_minutes' => $workMinutes,
+                'overtime_minutes' => max(0, $workMinutes - 480),
+            ];
+        });
+
+        $totalWorkMinutes = $calculatedRecords->sum('work_minutes');
+        $totalOvertimeMinutes = $calculatedRecords->sum('overtime_minutes');
+
+        $workedDays = $calculatedRecords
+            ->where('work_minutes', '>', 0)
+            ->count();
+
+        $averageWorkMinutes = $workedDays > 0
+            ? (int) round($totalWorkMinutes / $workedDays)
+            : 0;
+
+        $summary = [
+            'total_work_minutes' => $totalWorkMinutes,
+            'total_overtime_minutes' => $totalOvertimeMinutes,
+            'avg_work_minutes' => $averageWorkMinutes,
+        ];
+
+        $monthlyTrend = collect(range(5, 0))
+            ->map(function ($monthsAgo) use ($calculatedRecords) {
+                $month = now()
+                    ->subMonthsNoOverflow($monthsAgo)
+                    ->startOfMonth();
+
+                $monthRecords = $calculatedRecords->filter(function ($record) use ($month) {
+                    return $record['date']->year === $month->year
+                        && $record['date']->month === $month->month;
+                });
+
+                return [
+                    'month' => $month->format('Y/m'),
+                    'work_minutes' => $monthRecords->sum('work_minutes'),
+                    'overtime_minutes' => $monthRecords->sum('overtime_minutes'),
+                ];
+            })
+            ->values()
+            ->all();
+
+        $currentMonthRecords = $calculatedRecords->filter(function ($record) {
+            return $record['date']->year === now()->year
+                && $record['date']->month === now()->month;
+        });
+
+        $lateCount = $currentMonthRecords->filter(function ($record) {
+            return $record['clock_in']
+                && Carbon::parse($record['clock_in'])->gt(
+                    Carbon::createFromTime(9, 0)
+                );
+        })->count();
+
+        $earlyLeaveCount = $currentMonthRecords->filter(function ($record) {
+            return $record['clock_out']
+                && Carbon::parse($record['clock_out'])->lt(
+                    Carbon::createFromTime(18, 0)
+                );
+        })->count();
+
+        $longWorkCount = $currentMonthRecords->filter(function ($record) {
+            return $record['work_minutes'] > 600;
+        })->count();
+
+        $anomalies = [
+            'late_count' => $lateCount,
+            'early_leave_count' => $earlyLeaveCount,
+            'long_work_count' => $longWorkCount,
+        ];
+
+        return view('reports.index', compact(
+            'summary',
+            'monthlyTrend',
+            'anomalies'
+        ));
+    }
+
     public function show(Request $request, $id)
     {
         $user = $request->user();
