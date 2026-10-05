@@ -70,16 +70,16 @@
 
                 <td class="table__description">
                     <p class="table__description--item">
-                        {{ $attendance && $attendance->total_break_time
-                            ? Carbon\Carbon::parse($attendance->total_break_time)->format('G:i')
+                        {{ $attendance && $attendance->formatted_total_break_time
+                            ? $attendance->formatted_total_break_time
                             : '' }}
                     </p>
                 </td>
 
                 <td class="table__description">
                     <p class="table__description--item">
-                        {{ $attendance && $attendance->total_time
-                            ? Carbon\Carbon::parse($attendance->total_time)->format('G:i')
+                        {{ $attendance && $attendance->formatted_total_time
+                            ? $attendance->formatted_total_time
                             : '' }}
                     </p>
                 </td>

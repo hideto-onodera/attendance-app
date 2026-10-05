@@ -39,8 +39,8 @@ class AdminAttendanceController extends Controller
                     ->diffInMinutes(Carbon::parse($break->break_out));
             });
 
-            $attendanceRecord->total_break_time = null;
-            $attendanceRecord->total_time = null;
+            $attendanceRecord->formatted_total_break_time = null;
+            $attendanceRecord->formatted_total_time = null;
 
             if ($attendanceRecord->clock_in && $attendanceRecord->clock_out) {
                 $workMinutes = Carbon::parse($attendanceRecord->clock_in)
@@ -51,13 +51,13 @@ class AdminAttendanceController extends Controller
                     $workMinutes - $totalBreakMinutes
                 );
 
-                $attendanceRecord->total_break_time = sprintf(
+                $attendanceRecord->formatted_total_break_time = sprintf(
                     '%02d:%02d',
                     intdiv($totalBreakMinutes, 60),
                     $totalBreakMinutes % 60
                 );
 
-                $attendanceRecord->total_time = sprintf(
+                $attendanceRecord->formatted_total_time = sprintf(
                     '%02d:%02d',
                     intdiv($totalWorkMinutes, 60),
                     $totalWorkMinutes % 60
