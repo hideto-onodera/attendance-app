@@ -138,7 +138,7 @@ class AttendanceSeeder extends Seeder
         $date = $month->copy();
 
         while (count($dates) < $count) {
-            if (!$date->isWeekend()) {
+            if (! $date->isWeekend()) {
                 $dates[] = $date->copy();
             }
 

@@ -21,7 +21,7 @@ class AdminLoginController extends Controller
             ->where('admin_status', true)
             ->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (! $user || ! Hash::check($request->password, $user->password)) {
             $limiter->increment($request);
 
             throw ValidationException::withMessages([

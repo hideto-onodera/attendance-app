@@ -127,8 +127,7 @@ class AttendanceReportTest extends TestCase
         $response->assertViewHas('monthlyTrend', function ($monthlyTrend) {
             return count($monthlyTrend) === 6
                 && collect($monthlyTrend)->every(
-                    fn ($month) =>
-                        $month['work_minutes'] === 0
+                    fn ($month) => $month['work_minutes'] === 0
                         && $month['overtime_minutes'] === 0
                 );
         });

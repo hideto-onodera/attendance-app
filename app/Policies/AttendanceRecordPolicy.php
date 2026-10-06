@@ -10,7 +10,7 @@ class AttendanceRecordPolicy
     /**
      * Allow administrators to perform all actions.
      */
-    public function before(User $user, string $ability): bool|null
+    public function before(User $user, string $ability): ?bool
     {
         if ($user->admin_status) {
             return true;

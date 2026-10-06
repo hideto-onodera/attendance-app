@@ -31,7 +31,7 @@ class AdminAttendanceController extends Controller
 
         $attendanceRecords->each(function ($attendanceRecord) {
             $totalBreakMinutes = $attendanceRecord->breaks->sum(function ($break) {
-                if (!$break->break_in || !$break->break_out) {
+                if (! $break->break_in || ! $break->break_out) {
                     return 0;
                 }
 
@@ -136,7 +136,7 @@ class AdminAttendanceController extends Controller
             foreach ($breakIns as $index => $breakIn) {
                 $breakOut = $breakOuts[$index] ?? null;
 
-                if (!$breakIn || !$breakOut) {
+                if (! $breakIn || ! $breakOut) {
                     continue;
                 }
 
@@ -185,7 +185,7 @@ class AdminAttendanceController extends Controller
             function ($attendanceRecord) {
                 $totalBreakMinutes = $attendanceRecord->breaks->sum(
                     function ($break) {
-                        if (!$break->break_in || !$break->break_out) {
+                        if (! $break->break_in || ! $break->break_out) {
                             return 0;
                         }
 
@@ -282,7 +282,7 @@ class AdminAttendanceController extends Controller
             foreach ($attendanceRecords as $attendanceRecord) {
                 $totalBreakMinutes = $attendanceRecord->breaks->sum(
                     function ($break) {
-                        if (!$break->break_in || !$break->break_out) {
+                        if (! $break->break_in || ! $break->break_out) {
                             return 0;
                         }
 
@@ -371,7 +371,7 @@ class AdminAttendanceController extends Controller
             'applicationBreaks',
         ])->findOrFail($id);
 
-        if (!$application->is_approved) {
+        if (! $application->is_approved) {
             DB::transaction(function () use ($application) {
                 $attendanceRecord = $application->attendanceRecord;
 

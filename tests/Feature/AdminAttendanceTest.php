@@ -179,7 +179,7 @@ class AdminAttendanceTest extends TestCase
         ]);
 
         $response = $this->actingAs($admin)
-            ->get('/admin/attendance/' . $attendance->id);
+            ->get('/admin/attendance/'.$attendance->id);
 
         $response->assertOk();
         $response->assertSee('詳細確認ユーザー');
@@ -203,7 +203,7 @@ class AdminAttendanceTest extends TestCase
         ]);
 
         $response = $this->actingAs($admin)
-            ->post('/admin/attendance/' . $attendance->id, [
+            ->post('/admin/attendance/'.$attendance->id, [
                 'new_clock_in' => '08:30',
                 'new_clock_out' => '18:30',
                 'new_break_in' => ['12:15'],
@@ -212,7 +212,7 @@ class AdminAttendanceTest extends TestCase
             ]);
 
         $response->assertRedirect(
-            '/admin/attendance/' . $attendance->id
+            '/admin/attendance/'.$attendance->id
         );
 
         $this->assertDatabaseHas('attendance_records', [
@@ -236,7 +236,7 @@ class AdminAttendanceTest extends TestCase
         $attendance = $this->createAttendance($user);
 
         $response = $this->actingAs($admin)
-            ->post('/admin/attendance/' . $attendance->id, [
+            ->post('/admin/attendance/'.$attendance->id, [
                 'new_clock_in' => '18:00',
                 'new_clock_out' => '09:00',
                 'new_break_in' => [],
@@ -256,7 +256,7 @@ class AdminAttendanceTest extends TestCase
         $attendance = $this->createAttendance($user);
 
         $response = $this->actingAs($admin)
-            ->post('/admin/attendance/' . $attendance->id, [
+            ->post('/admin/attendance/'.$attendance->id, [
                 'new_clock_in' => '09:00',
                 'new_clock_out' => '18:00',
                 'new_break_in' => ['08:00'],
@@ -276,7 +276,7 @@ class AdminAttendanceTest extends TestCase
         $attendance = $this->createAttendance($user);
 
         $response = $this->actingAs($admin)
-            ->post('/admin/attendance/' . $attendance->id, [
+            ->post('/admin/attendance/'.$attendance->id, [
                 'new_clock_in' => '09:00',
                 'new_clock_out' => '18:00',
                 'new_break_in' => ['17:00'],
@@ -296,7 +296,7 @@ class AdminAttendanceTest extends TestCase
         $attendance = $this->createAttendance($user);
 
         $response = $this->actingAs($admin)
-            ->post('/admin/attendance/' . $attendance->id, [
+            ->post('/admin/attendance/'.$attendance->id, [
                 'new_clock_in' => '09:00',
                 'new_clock_out' => '18:00',
                 'new_break_in' => [],
@@ -361,8 +361,8 @@ class AdminAttendanceTest extends TestCase
         $response = $this->actingAs($admin)
             ->get(
                 '/admin/attendance/staff/'
-                . $user->id
-                . '?date=2026-10'
+                .$user->id
+                .'?date=2026-10'
             );
 
         $response->assertOk();
@@ -394,8 +394,8 @@ class AdminAttendanceTest extends TestCase
         $response = $this->actingAs($admin)
             ->get(
                 '/admin/attendance/staff/'
-                . $user->id
-                . '?date=2026-09'
+                .$user->id
+                .'?date=2026-09'
             );
 
         $response->assertOk();
@@ -424,8 +424,8 @@ class AdminAttendanceTest extends TestCase
         $response = $this->actingAs($admin)
             ->get(
                 '/admin/attendance/staff/'
-                . $user->id
-                . '?date=2026-11'
+                .$user->id
+                .'?date=2026-11'
             );
 
         $response->assertOk();
@@ -452,18 +452,18 @@ class AdminAttendanceTest extends TestCase
         $response = $this->actingAs($admin)
             ->get(
                 '/admin/attendance/staff/'
-                . $user->id
-                . '?date=2026-10'
+                .$user->id
+                .'?date=2026-10'
             );
 
         $response->assertOk();
         $response->assertSee(
-            '/admin/attendance/' . $attendance->id,
+            '/admin/attendance/'.$attendance->id,
             false
         );
 
         $detailResponse = $this->actingAs($admin)
-            ->get('/admin/attendance/' . $attendance->id);
+            ->get('/admin/attendance/'.$attendance->id);
 
         $detailResponse->assertOk();
         $detailResponse->assertSee('詳細リンクスタッフ');

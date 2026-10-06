@@ -55,7 +55,7 @@ class User extends Authenticatable implements MustVerifyEmail
             ->whereDate('date', today())
             ->first();
 
-        if (!$attendanceRecord) {
+        if (! $attendanceRecord) {
             return '勤務外';
         }
 

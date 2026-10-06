@@ -112,7 +112,7 @@ class AttendanceController extends Controller
 
         $formattedAttendanceRecords = $attendanceRecords->map(function ($attendanceRecord) {
             $totalBreakMinutes = $attendanceRecord->breaks->sum(function ($break) {
-                if (!$break->break_in || !$break->break_out) {
+                if (! $break->break_in || ! $break->break_out) {
                     return 0;
                 }
 
@@ -181,7 +181,7 @@ class AttendanceController extends Controller
             ->get();
 
         $calculatedRecords = $attendanceRecords->map(function ($attendanceRecord) {
-            if (!$attendanceRecord->clock_in || !$attendanceRecord->clock_out) {
+            if (! $attendanceRecord->clock_in || ! $attendanceRecord->clock_out) {
                 return [
                     'date' => Carbon::parse($attendanceRecord->date),
                     'clock_in' => $attendanceRecord->clock_in,
@@ -192,7 +192,7 @@ class AttendanceController extends Controller
             }
 
             $breakMinutes = $attendanceRecord->breaks->sum(function ($break) {
-                if (!$break->break_in || !$break->break_out) {
+                if (! $break->break_in || ! $break->break_out) {
                     return 0;
                 }
 
@@ -353,7 +353,7 @@ class AttendanceController extends Controller
         foreach ($breakIns as $index => $breakIn) {
             $breakOut = $breakOuts[$index] ?? null;
 
-            if (!$breakIn || !$breakOut) {
+            if (! $breakIn || ! $breakOut) {
                 continue;
             }
 
@@ -363,7 +363,7 @@ class AttendanceController extends Controller
             ]);
         }
 
-        return redirect('/attendance/detail/' . $attendanceRecord->id);
+        return redirect('/attendance/detail/'.$attendanceRecord->id);
     }
 
     public function applicationList(Request $request)

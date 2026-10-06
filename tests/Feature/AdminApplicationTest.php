@@ -125,7 +125,7 @@ class AdminApplicationTest extends TestCase
 
         $response = $this
             ->actingAs($admin)
-            ->get('/stamp_correction_request/approve/' . $application->id);
+            ->get('/stamp_correction_request/approve/'.$application->id);
 
         $response->assertOk();
         $response->assertSee('詳細確認ユーザー');
@@ -179,7 +179,7 @@ class AdminApplicationTest extends TestCase
 
         $response = $this
             ->actingAs($admin)
-            ->post('/stamp_correction_request/approve/' . $application->id);
+            ->post('/stamp_correction_request/approve/'.$application->id);
 
         $response->assertRedirect(
             route(
@@ -241,7 +241,7 @@ class AdminApplicationTest extends TestCase
 
         $response = $this
             ->actingAs($admin)
-            ->get('/stamp_correction_request/approve/' . $application->id);
+            ->get('/stamp_correction_request/approve/'.$application->id);
 
         $response->assertOk();
         $response->assertSee('承認済み');

@@ -148,7 +148,7 @@ class AttendanceListTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->get('/attendance/detail/' . $attendance->id);
+            ->get('/attendance/detail/'.$attendance->id);
 
         $response->assertStatus(200);
         $response->assertSee('2026年');
@@ -174,7 +174,7 @@ class AttendanceListTest extends TestCase
         ]);
 
         $response = $this->actingAs($user)
-            ->get('/attendance/detail/' . $attendance->id);
+            ->get('/attendance/detail/'.$attendance->id);
 
         $response->assertStatus(200);
         $response->assertSee($user->name);

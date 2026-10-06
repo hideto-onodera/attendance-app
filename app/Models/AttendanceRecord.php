@@ -36,7 +36,7 @@ class AttendanceRecord extends Model
     public function getTotalBreakTimeAttribute(): int
     {
         return $this->breaks->sum(function ($break) {
-            if (!$break->break_in || !$break->break_out) {
+            if (! $break->break_in || ! $break->break_out) {
                 return 0;
             }
 
@@ -47,7 +47,7 @@ class AttendanceRecord extends Model
 
     public function getTotalTimeAttribute(): int
     {
-        if (!$this->clock_in || !$this->clock_out) {
+        if (! $this->clock_in || ! $this->clock_out) {
             return 0;
         }
 
